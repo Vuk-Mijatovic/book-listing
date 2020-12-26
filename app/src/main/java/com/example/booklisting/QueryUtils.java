@@ -27,6 +27,7 @@ public class QueryUtils {
     }
 
     public static ArrayList<Book> extractBooks(String keyword) {
+        String author;
         if (TextUtils.isEmpty(keyword)) {
             return null;
         }
@@ -48,7 +49,17 @@ public class QueryUtils {
                 JSONObject item = items.optJSONObject(i);
                 JSONObject volumeInfo = item.optJSONObject("volumeInfo");
                 JSONArray authors = volumeInfo.optJSONArray("authors");
-                String author = authors.optString(0);
+                if (authors == null) {
+                    author = "N/A";
+                } else {
+                    if (authors.length() == 1) {
+                        author = authors.optString(0);
+                    } else if (authors.length() == 2) {
+                        author = authors.optString(0) + ", " + authors.optString(1);
+                    } else {
+                        author = authors.optString(0) + ", " + authors.optString(1) + " and others";
+                    }
+                }
                 String title = volumeInfo.optString("title");
                 books.add(new Book(author, title));
             }
@@ -121,7 +132,7 @@ public class QueryUtils {
     //Method to create URL using text entered in search field
     private static URL createURL(String keyword) {
 
-        String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&maxResults=8&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
+        String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&maxResults=20&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
         URL url = null;
         try {
             url = new URL(query);
