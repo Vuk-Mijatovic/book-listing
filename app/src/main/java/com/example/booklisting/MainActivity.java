@@ -1,7 +1,10 @@
 package com.example.booklisting;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -62,6 +65,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         bookList = findViewById(R.id.book_list);
 
         bookList.setAdapter(adapter);
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Book currentBook = adapter.getItem(i);
+                Uri webPage = Uri.parse(currentBook.getWebPage());
+                Intent openPage = new Intent(Intent.ACTION_VIEW, webPage);
+                startActivity(openPage);
+
+            }
+        });
 
     }
 

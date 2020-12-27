@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class QueryUtils {
+//NOT SURE HOW TO HANDLE POSSIBLE NULLPOINTEREXEPTIONS
 
     //Tag for the log messages
     public static final String LOG_TAG = QueryUtils.class.getSimpleName();
@@ -35,7 +36,7 @@ public class QueryUtils {
 
 
         URL url = createURL(keyword);
-        String JSONresponse = null;
+        String JSONresponse = "";
         try {
             JSONresponse = makeAHttpRequest(url);
         } catch (IOException e) {
@@ -61,7 +62,8 @@ public class QueryUtils {
                     }
                 }
                 String title = volumeInfo.optString("title");
-                books.add(new Book(author, title));
+                String webPage = volumeInfo.optString("infoLink");
+                books.add(new Book(author, title, webPage));
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing JSON response.");
@@ -139,7 +141,6 @@ public class QueryUtils {
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error with creating URL.");
         }
-        Log.i(LOG_TAG, "Query: " + url.toString());
         return url;
 
     }
