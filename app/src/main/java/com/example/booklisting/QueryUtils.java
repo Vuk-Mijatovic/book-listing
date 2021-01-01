@@ -29,6 +29,7 @@ public class QueryUtils {
 
     public static ArrayList<Book> extractBooks(String keyword) {
         String author;
+        String imageUrl;
         if (TextUtils.isEmpty(keyword)) {
             return null;
         }
@@ -42,7 +43,7 @@ public class QueryUtils {
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem making http connection.");
         }
-
+        Log.i(LOG_TAG, "Searching for: " + url);
         try {
             JSONObject root = new JSONObject(JSONresponse);
             JSONArray items = root.optJSONArray("items");
@@ -63,7 +64,12 @@ public class QueryUtils {
                 }
                 String title = volumeInfo.optString("title");
                 String webPage = volumeInfo.optString("infoLink");
-                books.add(new Book(author, title, webPage));
+                JSONObject imageLinks = volumeInfo.optJSONObject("imageLinks");
+                if (imageLinks != null) {
+                    imageUrl = imageLinks.optString("smallThumbnail");
+                } else
+                    imageUrl = "https://media-exp1.licdn.com/dms/image/C4D0BAQGpUHuSqzqVkw/company-logo_200_200/0/1550857067943?e=2159024400&v=beta&t=WOiC7IyHvC9I46NruMrRcLdcOz66V6JcuejZjzEpzZk";
+                books.add(new Book(author, title, webPage, imageUrl));
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing JSON response.");
@@ -73,6 +79,7 @@ public class QueryUtils {
 
 
     }
+
 
     //method to make a http request
     private static String makeAHttpRequest(URL url) throws IOException {

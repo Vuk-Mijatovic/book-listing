@@ -5,6 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:id="@+id/imageView"
+        tools:src="@drawable/content" />
+
+
     <TextView
         android:id="@+id/author_view"
         android:layout_width="0dp"
