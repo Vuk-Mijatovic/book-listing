@@ -25,12 +25,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     String keyword = "magic";
     BookAdapter adapter;
     ListView bookList;
+    View progressBar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        progressBar = findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.GONE);
 
 
         //Get the keyword that user entered
@@ -38,8 +41,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!(adapter == null)) {
+                    adapter.clear();
+                }
+                progressBar.setVisibility(View.VISIBLE);
                 TextView searchView = findViewById(R.id.text_input);
-                TextView emptyView = (TextView) findViewById(R.id.empty_list_item);
+                TextView emptyView = findViewById(R.id.empty_list_item);
                 bookList = findViewById(R.id.book_list);
                 bookList.setEmptyView(emptyView);
                 LoaderManager loaderManager = getSupportLoaderManager();
@@ -58,9 +65,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (isConnected) {
                     loaderManager.restartLoader(1, null, MainActivity.this);
                 } else {
-                    if (!(adapter == null)) {
-                        adapter.clear();
-                    }
+
                     emptyView.setText(getResources().getString(R.string.no_internet_connection));
                 }
             }
@@ -77,8 +82,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
+
         adapter = new BookAdapter(this, (ArrayList<Book>) list);
         bookList = findViewById(R.id.book_list);
+        progressBar.setVisibility(View.GONE);
 
         bookList.setAdapter(adapter);
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
