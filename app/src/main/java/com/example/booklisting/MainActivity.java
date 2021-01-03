@@ -22,10 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Book>> {
-    String keyword = "magic";
+    String keyword;
     BookAdapter adapter;
     ListView bookList;
     View progressBar;
+    TextView emptyView;
 
 
     @Override
@@ -83,9 +84,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
 
+        progressBar.setVisibility(View.GONE);
+
+        emptyView = findViewById(R.id.empty_list_item);
+        bookList = findViewById(R.id.book_list);
+        bookList.setEmptyView(emptyView);
+        emptyView.setText(R.string.no_books_found);
+
         adapter = new BookAdapter(this, (ArrayList<Book>) list);
         bookList = findViewById(R.id.book_list);
-        progressBar.setVisibility(View.GONE);
 
         bookList.setAdapter(adapter);
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -99,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             }
         });
+
 
     }
 

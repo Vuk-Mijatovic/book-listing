@@ -36,6 +36,7 @@ public class QueryUtils {
         ArrayList<Book> books = new ArrayList<>();
 
 
+
         URL url = createURL(keyword);
         String JSONresponse = "";
         try {
@@ -46,6 +47,10 @@ public class QueryUtils {
         Log.i(LOG_TAG, "Searching for: " + url);
         try {
             JSONObject root = new JSONObject(JSONresponse);
+            String noOfItems = root.getString("totalItems");
+            if (Integer.valueOf(noOfItems) == 0) {
+                return books;
+            }
             JSONArray items = root.optJSONArray("items");
             for (int i = 0; i < items.length(); i++) {
                 JSONObject item = items.optJSONObject(i);
