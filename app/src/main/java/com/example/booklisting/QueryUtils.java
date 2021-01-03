@@ -27,6 +27,8 @@ public class QueryUtils {
     private QueryUtils() {
     }
 
+
+
     public static ArrayList<Book> extractBooks(String keyword) {
         String author;
         String imageUrl;
