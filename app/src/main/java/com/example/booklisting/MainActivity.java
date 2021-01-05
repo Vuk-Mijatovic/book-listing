@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +27,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Book>> {
     String keyword;
     BookAdapter adapter;
-    ListView bookList;
+    RecyclerView bookList;
     View progressBar;
     TextView emptyView;
 
@@ -45,11 +48,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (!(adapter == null)) {
                     adapter.clear();
                 }
+                emptyView = findViewById(R.id.empty_list_item);
+                emptyView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
                 TextView searchView = findViewById(R.id.text_input);
-                TextView emptyView = findViewById(R.id.empty_list_item);
+
                 bookList = findViewById(R.id.book_list);
-                bookList.setEmptyView(emptyView);
                 LoaderManager loaderManager = getSupportLoaderManager();
 
 
@@ -84,28 +88,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
 
+
+        emptyView.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
 
-        emptyView = findViewById(R.id.empty_list_item);
-        bookList = findViewById(R.id.book_list);
-        bookList.setEmptyView(emptyView);
-        emptyView.setText(R.string.no_books_found);
 
-        adapter = new BookAdapter(this, (ArrayList<Book>) list);
-        bookList = findViewById(R.id.book_list);
+        adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) list);
+        bookList = (RecyclerView) findViewById(R.id.book_list);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 
+        bookList.setLayoutManager(layoutManager);
         bookList.setAdapter(adapter);
-        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Book currentBook = adapter.getItem(i);
-                Uri webPage = Uri.parse(currentBook.getWebPage());
-                Intent openPage = new Intent(Intent.ACTION_VIEW, webPage);
-                startActivity(openPage);
-
-            }
-        });
+        if (list.isEmpty()) {
+            emptyView = findViewById(R.id.empty_list_item);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(R.string.no_books_found);
+        }
 
 
     }
