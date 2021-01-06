@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -95,18 +96,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) list);
         bookList = (RecyclerView) findViewById(R.id.book_list);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+
+
 
         bookList.setLayoutManager(layoutManager);
         bookList.setAdapter(adapter);
         if (list.isEmpty()) {
-            emptyView = findViewById(R.id.empty_list_item);
             emptyView.setVisibility(View.VISIBLE);
             emptyView.setText(R.string.no_books_found);
         }
+        bookList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                boolean isLoading = false;
+                int lastItemPosition = layoutManager.findLastVisibleItemPosition();
+                int listSize = layoutManager.getItemCount();
+                if (lastItemPosition == (listSize - 1)) {
+                    if (!isLoading) {
+                      loadMore(list);
+                        isLoading = true;
+                    }
+                }
 
+            }
+        });
 
+                }
+
+    private void loadMore(List<Book> list) {
+
+        adapter.notifyDataSetChanged();
     }
+
 
     @Override
     public void onLoaderReset(@NonNull Loader<List<Book>> loader) {
