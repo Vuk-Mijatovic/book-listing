@@ -1,6 +1,7 @@
 package com.example.booklisting;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LoaderManager loaderManager;
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
+
 
 
     @Override
