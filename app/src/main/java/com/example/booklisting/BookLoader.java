@@ -6,15 +6,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookLoader extends AsyncTaskLoader<List<Book>> {
     String keyword;
+    int startIndex;
+    ArrayList<Book> books;
 
-    public BookLoader(@NonNull Context context, String keyword) {
+    public BookLoader(@NonNull Context context, String keyword, int startIndex, ArrayList<Book> books) {
         super(context);
         this.keyword = keyword;
+        this.startIndex = startIndex;
+        this.books = books;
     }
+
+
 
     @Nullable
     @Override
@@ -22,7 +29,7 @@ public class BookLoader extends AsyncTaskLoader<List<Book>> {
         if (keyword == null) {
             return null;
         }
-        return QueryUtils.extractBooks(keyword);
+        return QueryUtils.extractBooks(keyword, startIndex, books);
 
     }
 

@@ -28,55 +28,53 @@ public class QueryUtils {
     }
 
 
-
-    public static ArrayList<Book> extractBooks(String keyword) {
+    public static ArrayList<Book> extractBooks(String keyword, int startIndex, ArrayList<Book> books) {
         String author;
         String imageUrl;
         if (TextUtils.isEmpty(keyword)) {
             return null;
         }
-        ArrayList<Book> books = new ArrayList<>();
 
 
-
-        URL url = createURL(keyword);
-        String JSONresponse = "";
+        URL url = createURL(keyword, startIndex);
+        String JSONResponse = "";
         try {
-            JSONresponse = makeAHttpRequest(url);
+            JSONResponse = makeAHttpRequest(url);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem making http connection.");
         }
         Log.i(LOG_TAG, "Searching for: " + url);
         try {
-            JSONObject root = new JSONObject(JSONresponse);
-            String noOfItems = root.getString("totalItems");
-            if (Integer.valueOf(noOfItems) == 0) {
-                return books;
+            JSONObject root = new JSONObject(JSONResponse);
+            if (root.length() == 0) {
+                return new ArrayList<>();
             }
             JSONArray items = root.optJSONArray("items");
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject item = items.optJSONObject(i);
-                JSONObject volumeInfo = item.optJSONObject("volumeInfo");
-                JSONArray authors = volumeInfo.optJSONArray("authors");
-                if (authors == null) {
-                    author = "N/A";
-                } else {
-                    if (authors.length() == 1) {
-                        author = authors.optString(0);
-                    } else if (authors.length() == 2) {
-                        author = authors.optString(0) + ", " + authors.optString(1);
+            if (items != null) {
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject item = items.optJSONObject(i);
+                    JSONObject volumeInfo = item.optJSONObject("volumeInfo");
+                    JSONArray authors = volumeInfo.optJSONArray("authors");
+                    if (authors == null) {
+                        author = "N/A";
                     } else {
-                        author = authors.optString(0) + ", " + authors.optString(1) + " and others";
+                        if (authors.length() == 1) {
+                            author = authors.optString(0);
+                        } else if (authors.length() == 2) {
+                            author = authors.optString(0) + ", " + authors.optString(1);
+                        } else {
+                            author = authors.optString(0) + ", " + authors.optString(1) + " and others";
+                        }
                     }
+                    String title = volumeInfo.optString("title");
+                    String webPage = volumeInfo.optString("infoLink");
+                    JSONObject imageLinks = volumeInfo.optJSONObject("imageLinks");
+                    if (imageLinks != null) {
+                        imageUrl = imageLinks.optString("smallThumbnail");
+                    } else
+                        imageUrl = "https://media-exp1.licdn.com/dms/image/C4D0BAQGpUHuSqzqVkw/company-logo_200_200/0/1550857067943?e=2159024400&v=beta&t=WOiC7IyHvC9I46NruMrRcLdcOz66V6JcuejZjzEpzZk";
+                    books.add(new Book(author, title, webPage, imageUrl));
                 }
-                String title = volumeInfo.optString("title");
-                String webPage = volumeInfo.optString("infoLink");
-                JSONObject imageLinks = volumeInfo.optJSONObject("imageLinks");
-                if (imageLinks != null) {
-                    imageUrl = imageLinks.optString("smallThumbnail");
-                } else
-                    imageUrl = "https://media-exp1.licdn.com/dms/image/C4D0BAQGpUHuSqzqVkw/company-logo_200_200/0/1550857067943?e=2159024400&v=beta&t=WOiC7IyHvC9I46NruMrRcLdcOz66V6JcuejZjzEpzZk";
-                books.add(new Book(author, title, webPage, imageUrl));
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing JSON response.");
@@ -146,9 +144,9 @@ public class QueryUtils {
 
 
     //Method to create URL using text entered in search field
-    private static URL createURL(String keyword) {
+    private static URL createURL(String keyword, int startIndex) {
 
-        String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&maxResults=20&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
+        String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + startIndex + "&maxResults=40&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
         URL url = null;
         try {
             url = new URL(query);
