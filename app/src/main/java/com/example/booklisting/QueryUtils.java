@@ -17,7 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class QueryUtils {
-//NOT SURE HOW TO HANDLE POSSIBLE NULLPOINTEREXEPTIONS
 
     //Tag for the log messages
     public static final String LOG_TAG = QueryUtils.class.getSimpleName();

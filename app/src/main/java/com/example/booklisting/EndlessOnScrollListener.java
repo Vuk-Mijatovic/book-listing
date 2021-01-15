@@ -10,7 +10,7 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
     LinearLayoutManager layoutManager;
     int previousTotalItemCount = 0;
     boolean loading = true;
-    int visibleThreshold = 1;
+    int visibleThreshold = 10;
 
 
     public EndlessOnScrollListener(LinearLayoutManager layoutManager) {

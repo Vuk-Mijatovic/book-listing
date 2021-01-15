@@ -108,19 +108,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
 
 
-        emptyView.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
-        this.books = (ArrayList<Book>) list;
+        if ((adapter == null) || (adapter.getItemCount() == 0)) {
+
+            emptyView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            this.books = (ArrayList<Book>) list;
 
 
-        adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) list);
-
-
-        bookList.setAdapter(adapter);
-        adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
-
-        adapter.notifyItemRangeInserted(layoutManager.getItemCount(), books.size() - 1);
-        layoutManager.scrollToPosition(startIndex);
+            adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) list);
+            bookList.setAdapter(adapter);
+            adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+        }
+        else {
+           progressBar.setVisibility(View.GONE);
+            adapter.notifyItemRangeInserted(layoutManager.getItemCount(), books.size() - 1);
+        }
 
 
 
