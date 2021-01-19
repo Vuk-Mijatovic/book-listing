@@ -42,7 +42,6 @@ public class QueryUtils {
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem making http connection.");
         }
-        Log.i(LOG_TAG, "Searching for: " + url);
         try {
             JSONObject root = new JSONObject(JSONResponse);
             if (root.length() == 0) {

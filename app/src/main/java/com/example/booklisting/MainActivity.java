@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Book>> {
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LoaderManager loaderManager;
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
-
+    int noOfLoadMore = 0;
 
 
     @Override
@@ -89,7 +90,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     @Override
                     public void onLoadMore() {
                         startIndex = startIndex + 40;
+                        if ((books.get(books.size() - 1) != null)) { books.add(null); }
+
+                        adapter.notifyItemInserted(startIndex);
+
                         loadMore();
+
                     }
                 };
                 bookList.addOnScrollListener(scrollListener);
@@ -101,29 +107,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @NonNull
     @Override
     public Loader<List<Book>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new BookLoader(MainActivity.this, keyword, startIndex, books);
+        return new BookLoader(MainActivity.this, keyword, startIndex, books, adapter);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
 
-
         if ((adapter == null) || (adapter.getItemCount() == 0)) {
 
             emptyView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
-            this.books = (ArrayList<Book>) list;
 
 
             adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) list);
-            bookList.setAdapter(adapter);
             adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+            bookList.setAdapter(adapter);
+        } else {
+            progressBar.setVisibility(View.GONE);
+            adapter.notifyItemRangeInserted(layoutManager.getItemCount(), adapter.getItemCount() - 1);
         }
-        else {
-           progressBar.setVisibility(View.GONE);
-            adapter.notifyItemRangeInserted(layoutManager.getItemCount(), books.size() - 1);
-        }
-
 
 
         if (list.isEmpty()) {
@@ -133,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void loadMore() {
-        Log.i("MA loadMore: ", "Start Index = " + startIndex);
         loaderManager.restartLoader(1, null, MainActivity.this);
     }
 
