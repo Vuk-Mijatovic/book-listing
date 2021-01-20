@@ -30,6 +30,7 @@ public class QueryUtils {
     public static ArrayList<Book> extractBooks(String keyword, int startIndex, ArrayList<Book> books) {
         String author;
         String imageUrl;
+        String description;
         if (TextUtils.isEmpty(keyword)) {
             return null;
         }
@@ -66,12 +67,13 @@ public class QueryUtils {
                     }
                     String title = volumeInfo.optString("title");
                     String webPage = volumeInfo.optString("infoLink");
+                    description = volumeInfo.optString("description");
                     JSONObject imageLinks = volumeInfo.optJSONObject("imageLinks");
                     if (imageLinks != null) {
                         imageUrl = imageLinks.optString("smallThumbnail");
                     } else
                         imageUrl = "https://media-exp1.licdn.com/dms/image/C4D0BAQGpUHuSqzqVkw/company-logo_200_200/0/1550857067943?e=2159024400&v=beta&t=WOiC7IyHvC9I46NruMrRcLdcOz66V6JcuejZjzEpzZk";
-                    books.add(new Book(author, title, webPage, imageUrl));
+                    books.add(new Book(author, title, webPage, imageUrl, description));
                 }
             }
         } catch (JSONException e) {

@@ -99,6 +99,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
         private final TextView authorView;
         private final TextView titleView;
         private final ImageView imageView;
+        private final TextView descriptionView;
 
         private Book currentBook;
         private Context context;
@@ -112,6 +113,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
             this.authorView = itemView.findViewById(R.id.author_view);
             this.titleView = itemView.findViewById(R.id.title_view);
             this.imageView = itemView.findViewById(R.id.imageView);
+            this.descriptionView = itemView.findViewById(R.id.description_view);
 
             itemView.setOnClickListener(this);
 
@@ -122,7 +124,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
             this.currentBook = currentBook;
             this.authorView.setText(currentBook.getAuthor());
             this.titleView.setText(currentBook.getTitle());
+            this.descriptionView.setText(currentBook.getDescription());
             Picasso.get().load(currentBook.getImageUrl()).into(this.imageView);
+
         }
 
 
