@@ -1,5 +1,6 @@
 package com.example.booklisting;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LoaderManager loaderManager;
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
-    int noOfLoadMore = 0;
+    static MainActivity mainActivity;
 
 
     @Override
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         progressBar = findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
 
+        mainActivity = this;
 
         //Get the keyword that user entered
         Button searchButton = findViewById(R.id.search_button);
@@ -105,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 bookList.addOnScrollListener(scrollListener);
             }
         });
+
+
     }
 
 
@@ -146,6 +150,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(@NonNull Loader<List<Book>> loader) {
         adapter.clear();
+    }
+
+    public static MainActivity getInstance() {
+        return mainActivity;
     }
 
 

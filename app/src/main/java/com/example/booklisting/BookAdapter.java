@@ -16,6 +16,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import static com.google.android.material.internal.ContextUtils.getActivity;
+import static java.security.AccessController.getContext;
+
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
 
 
