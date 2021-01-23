@@ -42,19 +42,7 @@ public class BookLoader extends AsyncTaskLoader<List<Book>> {
         if (keyword == null) {
             return null;
         }
-
-        if ((adapter != null) && (adapter.getItemCount() > 0)) {
-            mainActivity.getInstance().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.removeNullData();
-
-                }
-            });
-        }
         return QueryUtils.extractBooks(keyword, startIndex);
-
-
     }
 
     @Override

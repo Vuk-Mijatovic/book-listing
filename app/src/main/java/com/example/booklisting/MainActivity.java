@@ -123,6 +123,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         } else {
             progressBar.setVisibility(View.GONE);
+            if (books.get(books.size() - 1) == null) {
+                books.remove(books.size() - 1);
+            }
             books.addAll(list);
             adapter.notifyDataSetChanged();
         }

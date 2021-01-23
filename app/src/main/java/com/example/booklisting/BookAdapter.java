@@ -89,11 +89,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
         notifyDataSetChanged();
     }
 
-    public void removeNullData() {
-        if (books.get(books.size() - 1) == null){
-        books.remove(books.size() - 1);
-        notifyDataSetChanged();    }
-    }
+
+
 
 
     class BookHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
