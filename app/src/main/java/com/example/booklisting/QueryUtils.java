@@ -27,10 +27,11 @@ public class QueryUtils {
     }
 
 
-    public static ArrayList<Book> extractBooks(String keyword, int startIndex, ArrayList<Book> books) {
+    public static ArrayList<Book> extractBooks(String keyword, int startIndex) {
         String author;
         String imageUrl;
         String description;
+        ArrayList<Book> books = new ArrayList<>();
         if (TextUtils.isEmpty(keyword)) {
             return null;
         }
@@ -79,7 +80,6 @@ public class QueryUtils {
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing JSON response.");
         }
-
         return books;
 
 

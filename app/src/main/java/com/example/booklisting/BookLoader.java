@@ -2,30 +2,31 @@ package com.example.booklisting;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
+import com.google.android.material.internal.ContextUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.booklisting.MainActivity.mainActivity;
-import static com.google.android.material.internal.ContextUtils.getActivity;
+import static com.google.android.material.internal.ContextUtils.*;
 
 public class BookLoader extends AsyncTaskLoader<List<Book>> {
     String keyword;
     int startIndex;
-    ArrayList<Book> books;
     BookAdapter adapter;
 
 
-    public BookLoader(@NonNull Context context, String keyword, int startIndex,
-                      ArrayList<Book> books, BookAdapter adapter) {
+    public BookLoader(@NonNull Context context, String keyword, int startIndex, BookAdapter adapter) {
         super(context);
         this.keyword = keyword;
         this.startIndex = startIndex;
-        this.books = books;
         this.adapter = adapter;
     }
 
@@ -43,7 +44,6 @@ public class BookLoader extends AsyncTaskLoader<List<Book>> {
         }
 
         if ((adapter != null) && (adapter.getItemCount() > 0)) {
-
             mainActivity.getInstance().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -52,7 +52,8 @@ public class BookLoader extends AsyncTaskLoader<List<Book>> {
                 }
             });
         }
-        return QueryUtils.extractBooks(keyword, startIndex, books);
+        return QueryUtils.extractBooks(keyword, startIndex);
+
 
     }
 

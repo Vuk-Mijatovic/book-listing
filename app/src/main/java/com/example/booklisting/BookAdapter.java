@@ -16,9 +16,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import static com.google.android.material.internal.ContextUtils.getActivity;
-import static java.security.AccessController.getContext;
-
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
 
 
@@ -89,12 +86,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
 
     public void addNullData() {
         books.add(null);
-        notifyItemInserted(books.size() - 1);
+        notifyDataSetChanged();
     }
 
     public void removeNullData() {
+        if (books.get(books.size() - 1) == null){
         books.remove(books.size() - 1);
-        notifyItemRemoved(books.size());
+        notifyDataSetChanged();    }
     }
 
 

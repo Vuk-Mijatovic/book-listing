@@ -97,11 +97,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     public void onLoadMore() {
                         startIndex = startIndex + 40;
                         if ((books.get(books.size() - 1) != null)) { books.add(null); }
-
-                        adapter.notifyItemInserted(startIndex);
-
+                        adapter.notifyDataSetChanged();
                         loadMore();
-
                     }
                 };
                 bookList.addOnScrollListener(scrollListener);
@@ -115,24 +112,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @NonNull
     @Override
     public Loader<List<Book>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new BookLoader(MainActivity.this, keyword, startIndex, books, adapter);
+        return new BookLoader(MainActivity.this, keyword, startIndex, adapter);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
-
         if ((adapter == null) || (adapter.getItemCount() == 0)) {
+
 
             emptyView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
 
-
-            adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) list);
+            books.addAll(list);
+            adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) books);
             adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
             bookList.setAdapter(adapter);
         } else {
             progressBar.setVisibility(View.GONE);
-            adapter.notifyItemRangeInserted(layoutManager.getItemCount(), adapter.getItemCount() - 1);
+            books.addAll(list);
+            adapter.notifyDataSetChanged();
         }
 
 

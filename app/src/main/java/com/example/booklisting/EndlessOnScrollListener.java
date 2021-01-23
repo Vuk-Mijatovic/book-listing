@@ -1,6 +1,8 @@
 package com.example.booklisting;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,7 +33,6 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
         }
 
         if (!loading && (lastVisibleItemPosition + visibleThreshold == totalItemCount) && dy > 0 ) {
-
             onLoadMore();
             loading = true;
         }
