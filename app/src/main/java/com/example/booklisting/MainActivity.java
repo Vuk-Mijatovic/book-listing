@@ -30,10 +30,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LoaderManager loaderManager;
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
-    static MainActivity mainActivity;
     EndlessOnScrollListener scrollListener;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +38,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         progressBar = findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
-        mainActivity = this;
-
-        //Get the keyword that user entered
         Button searchButton = findViewById(R.id.search_button);
+
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 InputMethodManager inputMethodManager = (InputMethodManager) MainActivity.this.getSystemService(INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 if (!(adapter == null)) {
                     adapter.clear();
                 }
@@ -69,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (keyword.length() == 0) {
                     keyword = " ";
                 }
-
                 ConnectivityManager cm =
                         (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -81,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 } else {
                     emptyView.setText(getResources().getString(R.string.no_internet_connection));
                 }
-
                 scrollListener = new EndlessOnScrollListener(layoutManager) {
                     @Override
                     public void onLoadMore() {
@@ -97,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
     }
-
 
     @NonNull
     @Override
@@ -115,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             } else {
                 emptyView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
-
                 books.addAll(list);
                 adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) books);
                 adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
@@ -129,24 +120,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             books.addAll(list);
             adapter.notifyDataSetChanged();
         }
-
-
-
     }
 
     public void loadMore() {
         loaderManager.restartLoader(1, null, MainActivity.this);
     }
 
-
     @Override
     public void onLoaderReset(@NonNull Loader<List<Book>> loader) {
         adapter.clear();
     }
-    public static MainActivity getInstance() {
-        return mainActivity;
-    }
-
-
 }
 
