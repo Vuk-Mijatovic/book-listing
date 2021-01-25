@@ -18,7 +18,6 @@ import java.util.ArrayList;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
 
-
     private static final int VIEW_TYPE_ITEM = 1;
     private static final int VIEW_TYPE_LOADING = 0;
     private final ArrayList<Book> books;
@@ -31,7 +30,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
         this.books = books;
     }
 
-
     @Override
     public int getItemViewType(int position) {
         if (books.get(position) != null) {
@@ -40,7 +38,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
             return VIEW_TYPE_LOADING;
         }
     }
-
 
     @NonNull
     @Override
@@ -58,7 +55,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
 
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull BookHolder holder, int position) {
         if (holder instanceof DataViewHolder) {
@@ -67,7 +63,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
             //  Bind the book object to the holder
             holder.bindBook(currentBook);
         }
-
     }
 
     @Override
@@ -79,7 +74,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
         int size = books.size();
         if (size > 0) {
             books.subList(0, size).clear();
-
             notifyItemRangeRemoved(0, size);
         }
     }
@@ -90,33 +84,24 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
     }
 
 
-
-
-
     class BookHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView authorView;
         private final TextView titleView;
         private final ImageView imageView;
         private final TextView descriptionView;
-
         private Book currentBook;
         private Context context;
 
 
         public BookHolder(Context context, @NonNull View itemView) {
             super(itemView);
-
             this.context = context;
-
             this.authorView = itemView.findViewById(R.id.author_view);
             this.titleView = itemView.findViewById(R.id.title_view);
             this.imageView = itemView.findViewById(R.id.imageView);
             this.descriptionView = itemView.findViewById(R.id.description_view);
-
             itemView.setOnClickListener(this);
-
         }
-
 
         public void bindBook(Book currentBook) {
             this.currentBook = currentBook;
@@ -124,13 +109,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
             this.titleView.setText(currentBook.getTitle());
             this.descriptionView.setText(currentBook.getDescription());
             Picasso.get().load(currentBook.getImageUrl()).into(this.imageView);
-
         }
-
 
         @Override
         public void onClick(View view) {
-
             Uri webPage = Uri.parse(currentBook.getWebPage());
             Intent openPage = new Intent(Intent.ACTION_VIEW, webPage);
             context.startActivity(openPage);
@@ -138,16 +120,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
     }
 
     private class DataViewHolder extends BookAdapter.BookHolder {
-
-
         public DataViewHolder(Context context, @NonNull View itemView) {
             super(context, itemView);
         }
     }
 
     private class ProgressViewHolder extends BookAdapter.BookHolder {
-
-
         public ProgressViewHolder(Context context, @NonNull View itemView) {
             super(context, itemView);
         }

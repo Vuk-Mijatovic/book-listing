@@ -26,7 +26,6 @@ public class QueryUtils {
     private QueryUtils() {
     }
 
-
     public static ArrayList<Book> extractBooks(String keyword, int startIndex) {
         String author;
         String imageUrl;
@@ -35,7 +34,6 @@ public class QueryUtils {
         if (TextUtils.isEmpty(keyword)) {
             return null;
         }
-
 
         URL url = createURL(keyword, startIndex);
         String JSONResponse = "";
@@ -81,8 +79,6 @@ public class QueryUtils {
             Log.e(LOG_TAG, "Problem parsing JSON response.");
         }
         return books;
-
-
     }
 
 
@@ -91,10 +87,8 @@ public class QueryUtils {
         String JSONresponse = "";
         if (url == null) return JSONresponse;
 
-
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
-
         // create http conection
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -103,18 +97,13 @@ public class QueryUtils {
             urlConnection.setConnectTimeout(15000 /* milliseconds */);
             urlConnection.connect();
 
-
             if (urlConnection.getResponseCode() == 200) {
                 inputStream = urlConnection.getInputStream();
 
                 JSONresponse = readFromStream(inputStream);
-
-
             } else {
                 Log.e(LOG_TAG, "Error code:" + urlConnection.getResponseCode());
             }
-
-
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem retrieving JSON response.");
         } finally {
@@ -125,7 +114,6 @@ public class QueryUtils {
                 inputStream.close();
             }
         }
-
         return JSONresponse;
     }
 
@@ -142,10 +130,8 @@ public class QueryUtils {
         return output.toString();
     }
 
-
     //Method to create URL using text entered in search field
     private static URL createURL(String keyword, int startIndex) {
-
         String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + startIndex + "&maxResults=40&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
         URL url = null;
         try {
@@ -154,9 +140,7 @@ public class QueryUtils {
             Log.e(LOG_TAG, "Error with creating URL.");
         }
         return url;
-
     }
-
 
 }
 
