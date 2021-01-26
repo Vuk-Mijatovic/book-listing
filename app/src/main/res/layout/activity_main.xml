@@ -3,15 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
     <EditText
         android:id="@+id/text_input"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:inputType="text"
-        android:hint="@string/enter_keyword" />
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_keyword"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/search_button"
@@ -28,14 +28,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/empty_list_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textSize="16sp" />
-
-
         <ProgressBar
             android:id="@+id/progress_bar"
             style="@style/Widget.AppCompat.ProgressBar"
@@ -45,5 +37,13 @@
 
 
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/empty_list_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="@color/black"/>
 
 </LinearLayout>

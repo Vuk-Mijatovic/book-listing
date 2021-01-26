@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if ((adapter == null) || (adapter.getItemCount() == 0)) {
 
             if (list.isEmpty()) {
+                progressBar.setVisibility(View.GONE);
                 emptyView.setVisibility(View.VISIBLE);
                 emptyView.setText(R.string.no_books_found);
             } else {
