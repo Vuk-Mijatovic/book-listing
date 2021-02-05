@@ -1,6 +1,7 @@
 package com.example.booklisting;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -11,8 +12,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,11 +34,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
     EndlessOnScrollListener scrollListener;
+    static boolean exceptionThrown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        exceptionThrown = false;
         progressBar = findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
         Button searchButton = findViewById(R.id.search_button);
@@ -45,51 +50,58 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(View view) {
                 InputMethodManager inputMethodManager = (InputMethodManager) MainActivity.this.getSystemService(INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                if (!(adapter == null)) {
-                    adapter.clear();
-                }
-                books.clear();
-                startIndex = 0;
-                emptyView = findViewById(R.id.empty_list_item);
-                emptyView.setVisibility(View.GONE);
-                progressBar.setVisibility(View.VISIBLE);
-                TextView searchView = findViewById(R.id.text_input);
-                loaderManager = getSupportLoaderManager();
-                bookList = findViewById(R.id.book_list);
-                layoutManager = new LinearLayoutManager(MainActivity.this);
-                bookList.setLayoutManager(layoutManager);
-                bookList.clearOnScrollListeners();
-
-                keyword = searchView.getText().toString().trim();
-                if (keyword.length() == 0) {
-                    keyword = " ";
-                }
-                ConnectivityManager cm =
-                        (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                boolean isConnected = activeNetwork != null &&
-                        activeNetwork.isConnectedOrConnecting();
-
-                if (isConnected) {
-                    loaderManager.restartLoader(1, null, MainActivity.this);
-                } else {
-                    emptyView.setText(getResources().getString(R.string.no_internet_connection));
-                }
-                scrollListener = new EndlessOnScrollListener(layoutManager) {
-                    @Override
-                    public void onLoadMore() {
-                        startIndex = startIndex + 40;
-                        if ((books.get(books.size() - 1) != null)) {
-                            books.add(null);
-                        }
-                        adapter.notifyDataSetChanged();
-                        loadMore();
-                    }
-                };
-                bookList.addOnScrollListener(scrollListener);
+                searchBooks();
             }
         });
     }
+
+    private void searchBooks() {
+        if (!(adapter == null)) {
+            adapter.clear();
+        }
+        books.clear();
+        startIndex = 0;
+        emptyView = findViewById(R.id.empty_list_item);
+        emptyView.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        TextView searchView = findViewById(R.id.text_input);
+        loaderManager = getSupportLoaderManager();
+        bookList = findViewById(R.id.book_list);
+        layoutManager = new LinearLayoutManager(MainActivity.this);
+        bookList.setLayoutManager(layoutManager);
+        bookList.clearOnScrollListeners();
+
+        keyword = searchView.getText().toString().trim();
+        if (keyword.length() == 0) {
+            keyword = " ";
+        }
+        ConnectivityManager cm =
+                (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if (isConnected) {
+            loaderManager.restartLoader(1, null, MainActivity.this);
+        } else {
+            progressBar.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(getResources().getString(R.string.no_internet_connection));
+        }
+        scrollListener = new EndlessOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore() {
+                startIndex = startIndex + 40;
+                if ((books.get(books.size() - 1) != null)) {
+                    books.add(null);
+                }
+                adapter.notifyDataSetChanged();
+                loadMore();
+            }
+        };
+        bookList.addOnScrollListener(scrollListener);
+    }
+
 
     @NonNull
     @Override
@@ -100,26 +112,38 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
         if ((adapter == null) || (adapter.getItemCount() == 0)) {
-
-            if (list.isEmpty()) {
+            if (exceptionThrown) {
                 progressBar.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);
-                emptyView.setText(R.string.no_books_found);
-            } else {
                 emptyView.setVisibility(View.GONE);
-                progressBar.setVisibility(View.GONE);
-                books.addAll(list);
-                adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) books);
-                adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
-                bookList.setAdapter(adapter);
+                showAlert();
+            } else {
+
+                if (list.isEmpty()) {
+                    progressBar.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                    emptyView.setText(R.string.no_books_found);
+                } else {
+                    emptyView.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    books.addAll(list);
+                    adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) books);
+                    adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+                    bookList.setAdapter(adapter);
+                }
             }
         } else {
-            progressBar.setVisibility(View.GONE);
-            if (books.get(books.size() - 1) == null) {
-                books.remove(books.size() - 1);
+            if (exceptionThrown) {
+                emptyView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                showAlert();
+            } else {
+                progressBar.setVisibility(View.GONE);
+                if (books.get(books.size() - 1) == null) {
+                    books.remove(books.size() - 1);
+                }
+                books.addAll(list);
+                adapter.notifyDataSetChanged();
             }
-            books.addAll(list);
-            adapter.notifyDataSetChanged();
         }
     }
 
@@ -131,5 +155,66 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(@NonNull Loader<List<Book>> loader) {
         adapter.clear();
     }
+
+    private void showAlert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setMessage("Something went wrong! Please, try again.");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                searchBooks();
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                TextView searchView =  findViewById(R.id.text_input);
+                searchView.setText("");
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
+    private static class BookLoader extends AsyncTaskLoader<List<Book>> {
+        String keyword;
+        int startIndex;
+        BookAdapter adapter;
+
+        public BookLoader(@NonNull Context context, String keyword, int startIndex, BookAdapter adapter) {
+            super(context);
+            this.keyword = keyword;
+            this.startIndex = startIndex;
+            this.adapter = adapter;
+        }
+
+        @Nullable
+        @Override
+        public List<Book> loadInBackground() {
+            if (keyword == null) {
+                return null;
+            }
+            try {
+                return QueryUtils.extractBooks(keyword, startIndex);
+            } catch (Exception e) {
+                exceptionThrown = true;
+            }
+            return new ArrayList<>();
+        }
+
+        @Override
+        protected void onStartLoading() {
+            super.onStartLoading();
+            forceLoad();
+        }
+
+        }
+
+
+
+
+
 }
 

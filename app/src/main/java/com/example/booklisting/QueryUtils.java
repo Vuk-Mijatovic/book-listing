@@ -26,7 +26,7 @@ public class QueryUtils {
     private QueryUtils() {
     }
 
-    public static ArrayList<Book> extractBooks(String keyword, int startIndex) {
+    public static ArrayList<Book> extractBooks(String keyword, int startIndex) throws Exception {
         String author;
         String imageUrl;
         String description;
@@ -37,12 +37,7 @@ public class QueryUtils {
 
         URL url = createURL(keyword, startIndex);
         String JSONResponse = "";
-        try {
             JSONResponse = makeAHttpRequest(url);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem making http connection.");
-        }
-        try {
             JSONObject root = new JSONObject(JSONResponse);
             if (root.length() == 0) {
                 return new ArrayList<>();
@@ -75,9 +70,7 @@ public class QueryUtils {
                     books.add(new Book(author, title, webPage, imageUrl, description));
                 }
             }
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Problem parsing JSON response.");
-        }
+
         return books;
     }
 
@@ -90,7 +83,6 @@ public class QueryUtils {
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
         // create http conection
-        try {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setReadTimeout(10000 /* milliseconds */);
@@ -104,16 +96,13 @@ public class QueryUtils {
             } else {
                 Log.e(LOG_TAG, "Error code:" + urlConnection.getResponseCode());
             }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem retrieving JSON response.");
-        } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
             if (inputStream != null) {
                 inputStream.close();
             }
-        }
+
         return JSONresponse;
     }
 
@@ -131,14 +120,10 @@ public class QueryUtils {
     }
 
     //Method to create URL using text entered in search field
-    private static URL createURL(String keyword, int startIndex) {
+    private static URL createURL(String keyword, int startIndex) throws MalformedURLException {
         String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + startIndex + "&maxResults=40&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
         URL url = null;
-        try {
-            url = new URL(query);
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Error with creating URL.");
-        }
+        url = new URL(query);
         return url;
     }
 
