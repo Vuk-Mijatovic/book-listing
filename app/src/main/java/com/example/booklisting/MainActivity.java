@@ -2,9 +2,13 @@ package com.example.booklisting;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -34,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
     EndlessOnScrollListener scrollListener;
-    static boolean exceptionThrown;
+    private static boolean exceptionThrown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +181,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         alert.show();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_settings){
+            Intent actionIntent = new Intent(this, SettingsActivity.class);
+            startActivity(actionIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private static class BookLoader extends AsyncTaskLoader<List<Book>> {
         String keyword;
