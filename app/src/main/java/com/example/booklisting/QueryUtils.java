@@ -1,5 +1,8 @@
 package com.example.booklisting;
 
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -26,16 +29,16 @@ public class QueryUtils {
     private QueryUtils() {
     }
 
-    public static ArrayList<Book> extractBooks(String keyword, int startIndex) throws Exception {
+    public static ArrayList<Book> extractBooks(String query) throws Exception {
         String author;
         String imageUrl;
         String description;
         ArrayList<Book> books = new ArrayList<>();
-        if (TextUtils.isEmpty(keyword)) {
+        if (TextUtils.isEmpty(query)) {
             return null;
         }
 
-        URL url = createURL(keyword, startIndex);
+        URL url = createURL(query);
         String JSONResponse = "";
             JSONResponse = makeAHttpRequest(url);
             JSONObject root = new JSONObject(JSONResponse);
@@ -120,8 +123,8 @@ public class QueryUtils {
     }
 
     //Method to create URL using text entered in search field
-    private static URL createURL(String keyword, int startIndex) throws MalformedURLException {
-        String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + startIndex + "&maxResults=40&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
+    private static URL createURL(String query) throws MalformedURLException {
+        Log.i(LOG_TAG, query);
         URL url = null;
         url = new URL(query);
         return url;
