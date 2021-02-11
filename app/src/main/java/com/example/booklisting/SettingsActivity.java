@@ -1,5 +1,7 @@
 package com.example.booklisting;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -10,6 +12,7 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceFragmentCompat;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -19,42 +22,13 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
     }
 
-    public static class SortByPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener{
+    public static class SortByPreferenceFragment extends PreferenceFragmentCompat {
+
+
 
         @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.settings_main);
-
-            Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
-            bindPreferenceSumaryToValue(orderBy);
-            
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.settings_main, rootKey);
         }
-
-
-
-        private void bindPreferenceSumaryToValue(Preference preference) {
-            preference.setOnPreferenceChangeListener(this);
-            SharedPreferences preferences = PreferenceManager.
-                    getDefaultSharedPreferences(preference.getContext());
-            String preferenceString = preferences.getString(preference.getKey(), "");
-            onPreferenceChange(preference, preferenceString);
-
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-            if (preference instanceof ListPreference) {
-                ListPreference listPreference = (ListPreference) preference;
-                int prefIndex = listPreference.findIndexOfValue(stringValue);
-                if (prefIndex >= 0) {
-                    CharSequence[] labels = listPreference.getEntries();
-                    preference.setSummary(labels[prefIndex]);
-                }
-            } else {
-                preference.setSummary(stringValue);
-            }
-            return true;        }
     }
 }
