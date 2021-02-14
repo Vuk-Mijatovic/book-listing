@@ -209,12 +209,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             super.onStartLoading();
             forceLoad();
         }
-
-        }
-
-
-
-
-
+    }
 }
 
