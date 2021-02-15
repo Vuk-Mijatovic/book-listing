@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -53,6 +54,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 searchBooks();
             }
         });
+        Button crashButton = new Button(this);
+        crashButton.setText("Crash!");
+        crashButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                throw new RuntimeException("Test Crash"); // Force a crash
+            }
+        });
+
+        addContentView(crashButton, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
     }
 
     private void searchBooks() {
@@ -175,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
         AlertDialog alert = builder.create();
         alert.show();
+
     }
 
 
