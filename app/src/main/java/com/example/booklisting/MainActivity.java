@@ -2,10 +2,16 @@ package com.example.booklisting;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.ClipboardManager;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -21,6 +27,7 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
     EndlessOnScrollListener scrollListener;
-    static boolean exceptionThrown;
+    private static boolean exceptionThrown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +114,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @NonNull
     @Override
     public Loader<List<Book>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new BookLoader(MainActivity.this, keyword, startIndex, adapter);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String orderBy = sharedPreferences.getString(getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default));
+
+        Uri baseUri = Uri.parse("https://www.googleapis.com/books/v1/volumes?");
+        Uri.Builder uriBuilder = baseUri.buildUpon();uriBuilder.appendQueryParameter("q", keyword);
+        uriBuilder.appendQueryParameter("startIndex", String.valueOf(startIndex));
+        uriBuilder.appendQueryParameter("maxResults", "40");
+        uriBuilder.appendQueryParameter("orderBy", orderBy);
+        uriBuilder.appendQueryParameter("key", "AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE");
+        String query = uriBuilder.toString();
+
+        return new BookLoader(MainActivity.this, query, adapter);
     }
 
     @Override
@@ -178,13 +197,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         alert.show();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_settings){
+            Intent actionIntent = new Intent(this, SettingsActivity.class);
+            startActivity(actionIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private static class BookLoader extends AsyncTaskLoader<List<Book>> {
         String keyword;
         int startIndex;
         BookAdapter adapter;
 
-        public BookLoader(@NonNull Context context, String keyword, int startIndex, BookAdapter adapter) {
+        public BookLoader(@NonNull Context context, String keyword, BookAdapter adapter) {
             super(context);
             this.keyword = keyword;
             this.startIndex = startIndex;
@@ -198,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return null;
             }
             try {
-                return QueryUtils.extractBooks(keyword, startIndex);
+                return QueryUtils.extractBooks(keyword);
             } catch (Exception e) {
                 exceptionThrown = true;
             }
