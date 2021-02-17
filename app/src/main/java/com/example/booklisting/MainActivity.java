@@ -9,8 +9,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -22,16 +22,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Book>> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<BookLoaderResult> {
     String keyword;
     BookAdapter adapter;
     RecyclerView bookList;
@@ -42,13 +39,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
     EndlessOnScrollListener scrollListener;
-    private static boolean exceptionThrown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        exceptionThrown = false;
         progressBar = findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
         Button searchButton = findViewById(R.id.search_button);
@@ -113,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @NonNull
     @Override
-    public Loader<List<Book>> onCreateLoader(int id, @Nullable Bundle args) {
+    public Loader<BookLoaderResult> onCreateLoader(int id, @Nullable Bundle args) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String orderBy = sharedPreferences.getString(getString(R.string.settings_order_by_key),
                 getString(R.string.settings_order_by_default));
@@ -130,38 +125,42 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<List<Book>> loader, List<Book> list) {
+    public void onLoadFinished(@NonNull Loader<BookLoaderResult> loader, BookLoaderResult loaderResult) {
         if ((adapter == null) || (adapter.getItemCount() == 0)) {
-            if (exceptionThrown) {
+            if (loaderResult.getException() != null) {
+                Log.i("Exception is", String.valueOf(loaderResult.getException()));
                 progressBar.setVisibility(View.GONE);
                 emptyView.setVisibility(View.GONE);
                 showAlert();
             } else {
 
-                if (list.isEmpty()) {
+                if (loaderResult.getResult().isEmpty()) {
                     progressBar.setVisibility(View.GONE);
                     emptyView.setVisibility(View.VISIBLE);
                     emptyView.setText(R.string.no_books_found);
                 } else {
                     emptyView.setVisibility(View.GONE);
                     progressBar.setVisibility(View.GONE);
-                    books.addAll(list);
+                    books.addAll(loaderResult.getResult());
                     adapter = new BookAdapter(this, R.layout.list_item, (ArrayList<Book>) books);
                     adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
                     bookList.setAdapter(adapter);
                 }
             }
         } else {
-            if (exceptionThrown) {
+            if (loaderResult.getResult().isEmpty()) {
                 emptyView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
-                showAlert();
+                if (books.get(books.size() - 1) == null) {
+                    books.remove(books.size() - 1);
+                    adapter.notifyDataSetChanged();
+                }
             } else {
                 progressBar.setVisibility(View.GONE);
                 if (books.get(books.size() - 1) == null) {
                     books.remove(books.size() - 1);
                 }
-                books.addAll(list);
+                books.addAll(loaderResult.getResult());
                 adapter.notifyDataSetChanged();
             }
         }
@@ -172,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<List<Book>> loader) {
+    public void onLoaderReset(@NonNull Loader<BookLoaderResult> loader) {
         adapter.clear();
     }
 
@@ -212,39 +211,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private static class BookLoader extends AsyncTaskLoader<List<Book>> {
-        String keyword;
-        int startIndex;
-        BookAdapter adapter;
-
-        public BookLoader(@NonNull Context context, String keyword, BookAdapter adapter) {
-            super(context);
-            this.keyword = keyword;
-            this.startIndex = startIndex;
-            this.adapter = adapter;
-        }
-
-        @Nullable
-        @Override
-        public List<Book> loadInBackground() {
-            if (keyword == null) {
-                return null;
-            }
-            try {
-                return QueryUtils.extractBooks(keyword);
-            } catch (Exception e) {
-                exceptionThrown = true;
-            }
-            return new ArrayList<>();
-        }
-
-        @Override
-        protected void onStartLoading() {
-            super.onStartLoading();
-            forceLoad();
-        }
     }
 }
 
