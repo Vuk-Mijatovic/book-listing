@@ -1,25 +1,18 @@
 package com.example.booklisting;
 
 import android.text.TextUtils;
-import android.util.Log;
-
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class QueryUtils {
-
-    //Tag for the log messages
-    public static final String LOG_TAG = QueryUtils.class.getSimpleName();
 
     //Private constructor, because no one should create instances of this class,
     // it is meant only for static helper methods
@@ -78,45 +71,13 @@ public class QueryUtils {
     //method to make a http request
     private static String makeAHttpRequest(URL url) throws IOException {
         String JSONresponse = "";
-        if (url == null) return JSONresponse;
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor()).build();
 
-        HttpURLConnection urlConnection = null;
-        InputStream inputStream = null;
-        // create http conection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
-            urlConnection.connect();
-
-            if (urlConnection.getResponseCode() == 200) {
-                inputStream = urlConnection.getInputStream();
-
-                JSONresponse = readFromStream(inputStream);
-            } else {
-                Log.e(LOG_TAG, "Error code:" + urlConnection.getResponseCode());
-            }
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
+        JSONresponse = response.body().string();
         return JSONresponse;
-    }
-
-    private static String readFromStream(InputStream inputStream) throws IOException {
-        StringBuilder output = new StringBuilder();
-        if (inputStream != null) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = reader.readLine();
-            while (line != null) {
-                output.append(line);
-                line = reader.readLine();
-            }
-        }
-        return output.toString();
     }
 
     //Method to create URL using text entered in search field
