@@ -4,20 +4,16 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
-
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class QueryUtils {
 
@@ -29,16 +25,16 @@ public class QueryUtils {
     private QueryUtils() {
     }
 
-    public static ArrayList<Book> extractBooks(String query) throws Exception {
+    public static ArrayList<Book> extractBooks(String keyword, int startIndex) throws Exception {
         String author;
         String imageUrl;
         String description;
         ArrayList<Book> books = new ArrayList<>();
-        if (TextUtils.isEmpty(query)) {
+        if (TextUtils.isEmpty(keyword)) {
             return null;
         }
 
-        URL url = createURL(query);
+        URL url = createURL(keyword, startIndex);
         String JSONResponse = "";
             JSONResponse = makeAHttpRequest(url);
             JSONObject root = new JSONObject(JSONResponse);
@@ -81,50 +77,18 @@ public class QueryUtils {
     //method to make a http request
     private static String makeAHttpRequest(URL url) throws IOException {
         String JSONresponse = "";
-        if (url == null) return JSONresponse;
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor()).build();
 
-        HttpURLConnection urlConnection = null;
-        InputStream inputStream = null;
-        // create http conection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setReadTimeout(100000 /* milliseconds */);
-            urlConnection.setConnectTimeout(150000 /* milliseconds */);
-            urlConnection.connect();
-
-            if (urlConnection.getResponseCode() == 200) {
-                inputStream = urlConnection.getInputStream();
-
-                JSONresponse = readFromStream(inputStream);
-            } else {
-                Log.e(LOG_TAG, "Error code:" + urlConnection.getResponseCode());
-            }
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
+        JSONresponse = response.body().string();
         return JSONresponse;
     }
 
-    private static String readFromStream(InputStream inputStream) throws IOException {
-        StringBuilder output = new StringBuilder();
-        if (inputStream != null) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = reader.readLine();
-            while (line != null) {
-                output.append(line);
-                line = reader.readLine();
-            }
-        }
-        return output.toString();
-    }
-
     //Method to create URL using text entered in search field
-    private static URL createURL(String query) throws MalformedURLException {
-        Log.i(LOG_TAG, query);
+    private static URL createURL(String keyword, int startIndex) throws MalformedURLException {
+        String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + startIndex + "&maxResults=40&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
         URL url = null;
         url = new URL(query);
         return url;

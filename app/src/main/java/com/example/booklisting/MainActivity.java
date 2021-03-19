@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
         AlertDialog alert = builder.create();
         alert.show();
+
     }
 
     @Override
