@@ -1,19 +1,21 @@
 package com.example.booklisting;
 
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
+
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
 
 public class QueryUtils {
 
