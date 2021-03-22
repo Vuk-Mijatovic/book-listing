@@ -9,7 +9,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -126,15 +125,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<BookLoaderResult> loader, BookLoaderResult loaderResult) {
+        if (loaderResult == null) {
+            showAlert();
+            return;
+        }
+
         if ((adapter == null) || (adapter.getItemCount() == 0)) {
             if (loaderResult.getException() != null) {
-                Log.i("Exception is", String.valueOf(loaderResult.getException()));
                 progressBar.setVisibility(View.GONE);
                 emptyView.setVisibility(View.GONE);
                 showAlert();
             } else {
 
-                if (loaderResult.getResult().isEmpty()) {
+                if (loaderResult.getResult().isEmpty())  {
                     progressBar.setVisibility(View.GONE);
                     emptyView.setVisibility(View.VISIBLE);
                     emptyView.setText(R.string.no_books_found);
@@ -157,9 +160,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
             } else {
                 progressBar.setVisibility(View.GONE);
-                if (books.get(books.size() - 1) == null) {
-                    books.remove(books.size() - 1);
-                }
+                books.remove(books.size() - 1);
                 books.addAll(loaderResult.getResult());
                 adapter.notifyDataSetChanged();
             }
