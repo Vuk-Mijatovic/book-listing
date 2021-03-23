@@ -1,19 +1,16 @@
 package com.example.booklisting;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
@@ -25,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Book>> {
+    static boolean exceptionThrown;
     String keyword;
     BookAdapter adapter;
     RecyclerView bookList;
@@ -35,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     LinearLayoutManager layoutManager;
     ArrayList<Book> books = new ArrayList<>();
     EndlessOnScrollListener scrollListener;
-    static boolean exceptionThrown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             if (exceptionThrown) {
                 progressBar.setVisibility(View.GONE);
                 emptyView.setVisibility(View.GONE);
-                showAlert();
             } else {
 
                 if (list.isEmpty()) {
@@ -136,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             if (exceptionThrown) {
                 emptyView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
-                showAlert();
             } else {
                 progressBar.setVisibility(View.GONE);
                 if (books.get(books.size() - 1) == null) {
@@ -155,28 +150,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(@NonNull Loader<List<Book>> loader) {
         adapter.clear();
-    }
-
-    private void showAlert(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setMessage("Something went wrong! Please, try again.");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                searchBooks();
-            }
-        });
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                TextView searchView =  findViewById(R.id.text_input);
-                searchView.setText("");
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-
     }
 
 
