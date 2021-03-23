@@ -12,11 +12,17 @@ public class Book {
         this.author = author;
         this.title = title;
         this.webPage = webPage;
-        this.imageUrl = imageLink;
+        if (imageLink.contains("https")) {
+            this.imageUrl = imageLink;
+        } else {
+            imageUrl = imageLink.replace("http", "https");
+        }
         this.description = description;
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
     public String getAuthor() {
         return author;
