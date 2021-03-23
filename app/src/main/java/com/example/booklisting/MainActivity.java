@@ -12,7 +12,6 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -114,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 getString(R.string.settings_order_by_default));
 
         Uri baseUri = Uri.parse("https://www.googleapis.com/books/v1/volumes?");
-        Uri.Builder uriBuilder = baseUri.buildUpon();uriBuilder.appendQueryParameter("q", keyword);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+        uriBuilder.appendQueryParameter("q", keyword);
         uriBuilder.appendQueryParameter("startIndex", String.valueOf(startIndex));
         uriBuilder.appendQueryParameter("maxResults", "40");
         uriBuilder.appendQueryParameter("orderBy", orderBy);

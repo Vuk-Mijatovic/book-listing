@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -27,16 +26,14 @@ public class QueryUtils {
     private QueryUtils() {
     }
 
-    public static ArrayList<Book> extractBooks(String keyword, int startIndex) throws Exception {
+    public static ArrayList<Book> extractBooks(String query) throws Exception {
         String author;
         String imageUrl;
         String description;
         ArrayList<Book> books = new ArrayList<>();
-        if (TextUtils.isEmpty(keyword)) {
-            return null;
-        }
+        if (TextUtils.isEmpty(query)) { return null; }
 
-        URL url = createURL(keyword, startIndex);
+        URL url = new URL(query);
         String JSONResponse = "";
             JSONResponse = makeAHttpRequest(url);
             JSONObject root = new JSONObject(JSONResponse);
@@ -71,29 +68,18 @@ public class QueryUtils {
                     books.add(new Book(author, title, webPage, imageUrl, description));
                 }
             }
-
-        return books;
+            return books;
     }
-
 
     //method to make a http request
     private static String makeAHttpRequest(URL url) throws IOException {
         String JSONresponse = "";
         OkHttpClient client = new OkHttpClient.Builder()
                 .addNetworkInterceptor(new StethoInterceptor()).build();
-
         Request request = new Request.Builder().url(url).build();
         Response response = client.newCall(request).execute();
         JSONresponse = response.body().string();
         return JSONresponse;
-    }
-
-    //Method to create URL using text entered in search field
-    private static URL createURL(String keyword, int startIndex) throws MalformedURLException {
-        String query = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + startIndex + "&maxResults=40&key=AIzaSyAQ_cswvQ3PenOYLnuTZ4VORlEp3tfnXtE";
-        URL url = null;
-        url = new URL(query);
-        return url;
     }
 
 }
